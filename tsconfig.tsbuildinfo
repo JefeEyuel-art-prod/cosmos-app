@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/index.tsx","./src/components/sequentiallist.tsx","./src/components/typewritertext.tsx","./src/vite-env.d.ts/vite-env.d.ts"],"version":"6.0.3"}
+{"root":["./src/App.tsx","./src/index.tsx","./src/components/SequentialList.tsx","./src/components/TypeWriterText.tsx","./src/vite-env.d.ts/vite-env.d.ts"],"version":"6.0.3"}

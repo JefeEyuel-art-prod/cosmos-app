@@ -1,6 +1,6 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi import FastAPI # pyright: ignore[reportMissingImports]
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+from pydantic import BaseModel # pyright: ignore[reportMissingImports]
 from datetime import datetime
 
 app = FastAPI(title="Cosmos Backend")
