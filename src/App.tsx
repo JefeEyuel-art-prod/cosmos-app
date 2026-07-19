@@ -316,15 +316,16 @@ function App() {
           </div>
 
           <div class="transit-path">
-            <For each={transitLog}>{(entry) => (
+            {transitLog.map((entry, index) => (
               <span
                 class="path-node"
                 classList={{ active: selectedTransit().planet === entry.planet }}
+                style={`--i: ${index}`}
                 onClick={() => selectTransit(entry)}
               >
                 {entry.symbol}
               </span>
-            )}</For>
+            ))}
           </div>
 
           <div class="transit-grid">
