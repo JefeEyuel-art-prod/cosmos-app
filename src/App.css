@@ -549,6 +549,55 @@
   gap: 12px;
 }
 
+.galaxy-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.galaxy-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.galaxy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.galaxy-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgba(15, 10, 35, 0.9);
+  border: 1px solid rgba(170, 59, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(170, 59, 255, 0.18);
+}
+
+.galaxy-card img {
+  width: 100%;
+  display: block;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  filter: saturate(1.15) contrast(1.1);
+}
+
+.galaxy-card span {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(18, 9, 40, 0.85);
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 12px rgba(136, 83, 255, 0.75);
+}
+
 .tarot-card-button {
   display: flex;
   align-items: center;

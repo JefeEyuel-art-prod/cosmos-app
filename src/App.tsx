@@ -160,6 +160,12 @@ const tarotDeck = [
   },
 ]
 
+const galaxyImages = [
+  { src: '/galaxy1.svg', label: 'Nova Spiral' },
+  { src: '/galaxy2.svg', label: 'Cosmic Bloom' },
+  { src: '/galaxy3.svg', label: 'Nebula Mirage' },
+]
+
 function App() {
   const [name, setName] = createSignal('')
   const [eventIndex, setEventIndex] = createSignal(0)
@@ -402,6 +408,24 @@ function App() {
                 <span class="tarot-symbol-small">{card.symbol}</span>
                 <span>{card.title}</span>
               </button>
+            )}</For>
+          </div>
+        </article>
+
+        <article class="panel galaxy-panel">
+          <div class="galaxy-header">
+            <div>
+              <h2>Galaxy Gallery</h2>
+              <p>Preview a few glowing nebulae and spirals in the cosmos, with neon energy overlays.</p>
+            </div>
+          </div>
+
+          <div class="galaxy-grid">
+            <For each={galaxyImages}>{(image) => (
+              <div class="galaxy-card">
+                <img src={image.src} alt={image.label} />
+                <span>{image.label}</span>
+              </div>
             )}</For>
           </div>
         </article>
