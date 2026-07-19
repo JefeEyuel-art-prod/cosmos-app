@@ -17,6 +17,7 @@ const pillars = [
 ]
 
 const signals = ['Vision', 'Memory', 'Awareness', 'Creation']
+const auraDots = [0, 1, 2, 3, 4, 5]
 
 const astroEvents = [
   {
@@ -219,6 +220,14 @@ function App() {
         <div class="hero-actions">
           <a class="primary-btn" href="#begin">Begin the journey</a>
           <a class="secondary-btn" href="#vision">Explore the vision</a>
+        </div>
+
+        <div class="hero-visual">
+          <div class="neon-core" />
+          <div class="neon-guts" />
+          <div class="neon-pulse">
+            <For each={auraDots}>{() => <span class="neon-dot" />}</For>
+          </div>
         </div>
       </header>
 
