@@ -399,6 +399,108 @@
     drift calc(20s / var(--scale, 1)) ease-in-out infinite;
 }
 
+.tarot-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tarot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.tarot-draw-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: linear-gradient(90deg, var(--accent), #6d7cff);
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarot-draw-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(170, 59, 255, 0.2);
+}
+
+.tarot-status {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(170, 59, 255, 0.14);
+}
+
+.tarot-preview {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.tarot-preview-symbol {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(242, 233, 255, 0.85));
+  border: 1px solid rgba(170, 59, 255, 0.16);
+  color: var(--accent);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.tarot-message {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.tarot-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tarot-card-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(170, 59, 255, 0.12);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.tarot-card-button:hover,
+.tarot-card-button.active {
+  transform: translateY(-2px);
+  border-color: rgba(170, 59, 255, 0.22);
+  background: rgba(238, 223, 255, 0.95);
+}
+
+.tarot-symbol-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(170, 59, 255, 0.12);
+  color: var(--accent);
+  font-weight: 700;
+}
+
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
