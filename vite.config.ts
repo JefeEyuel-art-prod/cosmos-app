@@ -1,4 +1,3 @@
-# Build vite config to support API proxy
 import { defineConfig } from 'vite'
 import solid from 'vite-plugin-solid'
 
