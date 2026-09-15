@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { randomUUID } from 'crypto'
 
 dotenv.config()
 
@@ -204,6 +205,71 @@ app.get('/api/config', (req: Request, res: Response) => {
     maxConsecutiveFailures: MAX_CONSECUTIVE_FAILURES,
     currentConsecutiveFailures: consecutiveFailures
   })
+})
+
+// --- Reading persistence (in-memory) ---------------------------------------
+// Readings are kept in memory for this demo API. They reset on server
+// restart. Capped at MAX_READINGS so the process can't grow unbounded.
+interface Reading {
+  id: string
+  createdAt: string
+  name?: string
+  birthDate?: string
+  birthTime?: string
+  sunSign?: string
+  moonSign?: string
+  risingSign?: string
+  deckId?: string
+  deckName?: string
+  card?: string
+  transitPlanet?: string
+  readingText: string
+}
+
+const readings: Reading[] = []
+const MAX_READINGS = 500
+
+app.post('/api/readings', (req: Request, res: Response) => {
+  const body = req.body || {}
+  if (!body.readingText || typeof body.readingText !== 'string') {
+    return res.status(400).json({ error: 'readingText is required' })
+  }
+
+  const reading: Reading = {
+    id: randomUUID(),
+    createdAt: new Date().toISOString(),
+    name: body.name,
+    birthDate: body.birthDate,
+    birthTime: body.birthTime,
+    sunSign: body.sunSign,
+    moonSign: body.moonSign,
+    risingSign: body.risingSign,
+    deckId: body.deckId,
+    deckName: body.deckName,
+    card: body.card,
+    transitPlanet: body.transitPlanet,
+    readingText: body.readingText,
+  }
+
+  readings.push(reading)
+  if (readings.length > MAX_READINGS) {
+    readings.splice(0, readings.length - MAX_READINGS)
+  }
+
+  res.status(201).json({ data: reading })
+})
+
+app.get('/api/readings/:id', (req: Request, res: Response) => {
+  const reading = readings.find((r) => r.id === req.params.id)
+  if (!reading) {
+    return res.status(404).json({ error: 'Reading not found' })
+  }
+  res.json({ data: reading })
+})
+
+app.get('/api/readings', (req: Request, res: Response) => {
+  const limit = Math.min(parseInt(String(req.query.limit || '20'), 10) || 20, 100)
+  res.json({ data: readings.slice(-limit).reverse() })
 })
 
 app.listen(PORT, () => {

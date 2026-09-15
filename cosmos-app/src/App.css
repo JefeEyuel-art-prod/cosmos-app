@@ -181,6 +181,16 @@
   margin-bottom: 12px;
 }
 
+/* Panels always sit on a light card background regardless of OS theme,
+   so headings must stay dark instead of following --text-h (which flips
+   to near-white in dark mode and becomes invisible). */
+.hero-card h1,
+.hero-card .eyebrow,
+.panel h2,
+.panel h3 {
+  color: #1b1030;
+}
+
 .pillar-list {
   display: grid;
   gap: 12px;
@@ -569,33 +579,54 @@
 }
 
 .galaxy-card {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border-radius: 24px;
-  background: rgba(15, 10, 35, 0.9);
+  background: rgba(15, 10, 35, 0.95);
   border: 1px solid rgba(170, 59, 255, 0.2);
   box-shadow: 0 20px 40px rgba(170, 59, 255, 0.18);
 }
 
-.galaxy-card img {
+.galaxy-card-image {
   width: 100%;
-  display: block;
   aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.galaxy-card-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
   object-fit: cover;
   filter: saturate(1.15) contrast(1.1);
 }
 
-.galaxy-card span {
-  position: absolute;
-  left: 16px;
-  bottom: 14px;
-  padding: 10px 14px;
+.galaxy-card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: linear-gradient(180deg, rgba(24, 12, 46, 0.98), rgba(12, 6, 26, 0.98));
+}
+
+.galaxy-card-label {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(18, 9, 40, 0.85);
-  color: white;
+  background: rgba(170, 59, 255, 0.22);
+  color: #ffffff;
   font-weight: 700;
   letter-spacing: 0.02em;
-  text-shadow: 0 0 12px rgba(136, 83, 255, 0.75);
+}
+
+.galaxy-card-description {
+  margin: 0;
+  color: rgba(238, 230, 255, 0.9);
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
 .tarot-card-button {
@@ -604,18 +635,20 @@
   gap: 10px;
   padding: 14px 16px;
   border-radius: 18px;
-  border: 1px solid rgba(170, 59, 255, 0.12);
-  background: rgba(255, 255, 255, 0.86);
-  color: var(--text-h);
+  border: 1px solid rgba(170, 59, 255, 0.25);
+  background: linear-gradient(160deg, rgba(28, 12, 48, 0.95), rgba(58, 24, 92, 0.9));
+  color: #f5edff;
   cursor: pointer;
+  font-weight: 600;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .tarot-card-button:hover,
 .tarot-card-button.active {
   transform: translateY(-2px);
-  border-color: rgba(170, 59, 255, 0.22);
-  background: rgba(238, 223, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(160deg, rgba(64, 28, 108, 0.98), rgba(122, 59, 214, 0.95));
+  color: #ffffff;
 }
 
 .tarot-symbol-small {
@@ -625,8 +658,8 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: rgba(170, 59, 255, 0.12);
-  color: var(--accent);
+  background: rgba(255, 255, 255, 0.16);
+  color: #f5edff;
   font-weight: 700;
 }
 
@@ -653,6 +686,225 @@
   }
 }
 
+.deck-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.deck-tab {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(170, 59, 255, 0.2);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-h);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.deck-tab:hover {
+  transform: translateY(-2px);
+}
+
+.deck-tab.active {
+  background: linear-gradient(90deg, var(--accent), #6d7cff);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.zodiac-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.zodiac-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.birth-chart-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(170, 59, 255, 0.08);
+  border: 1px solid rgba(170, 59, 255, 0.14);
+}
+
+.birth-chart-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.birth-chart-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-h);
+}
+
+.birth-chart-input {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(170, 59, 255, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-h);
+  font: inherit;
+  outline: none;
+}
+
+.birth-chart-input-narrow {
+  width: 110px;
+}
+
+.chart-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.chart-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(170, 59, 255, 0.14);
+}
+
+.chart-summary-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+
+.chart-summary-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.chart-disclaimer {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.zodiac-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.zodiac-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border-radius: 16px;
+  border: 1px solid rgba(170, 59, 255, 0.16);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.zodiac-chip:hover,
+.zodiac-chip.active {
+  transform: translateY(-3px);
+  border-color: rgba(170, 59, 255, 0.4);
+  background: linear-gradient(160deg, rgba(238, 223, 255, 0.95), rgba(216, 191, 255, 0.9));
+}
+
+.zodiac-symbol {
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+
+.zodiac-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.zodiac-detail {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(170, 59, 255, 0.14);
+}
+
+.zodiac-detail h3 {
+  margin: 0 0 8px;
+  color: var(--text-h);
+}
+
+.zodiac-detail p {
+  margin: 0 0 6px;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.zodiac-detail-line {
+  color: var(--text-h);
+}
+
+.deep-reading-btn {
+  align-self: flex-start;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  background: linear-gradient(90deg, var(--accent), #6d7cff);
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deep-reading-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(170, 59, 255, 0.2);
+}
+
+.deep-reading-message {
+  margin: 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(170, 59, 255, 0.08);
+  border: 1px solid rgba(170, 59, 255, 0.14);
+  color: var(--text-h);
+  line-height: 1.6;
+}
+
+.deep-reading-share {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.deep-reading-share code {
+  background: rgba(170, 59, 255, 0.12);
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--text-h);
+}
+
+.deep-reading-btn:disabled {
+  opacity: 0.7;
+  cursor: progress;
+  transform: none;
+}
+
 @media (max-width: 840px) {
   .app-shell {
     padding: 20px;
@@ -663,6 +915,18 @@
   }
 
   .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .galaxy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .zodiac-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .chart-summary {
     grid-template-columns: 1fr;
   }
 }
