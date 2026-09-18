@@ -3,6 +3,7 @@
 ## Quick Start
 
 ### Windows (PowerShell)
+
 ```powershell
 # Clean launch with default settings (no crashes/failures)
 .\launch.ps1
@@ -15,6 +16,7 @@
 ```
 
 ### Linux / Git Bash
+
 ```bash
 # Clean launch with default settings
 ./launch.sh
@@ -29,7 +31,7 @@
 ## Parameters
 
 | Parameter | Type | Default | Range | Description |
-|-----------|------|---------|-------|-------------|
+| ----------- | ------ | --------- | ------- | ------------- |
 | Mode | string | development | - | Environment (development/production) |
 | CrashProb | float | 0 | 0-1 | Probability API will crash (0.1 = 10%) |
 | FailureProb | float | 0 | 0-1 | Probability request fails (0.05 = 5%) |
@@ -46,10 +48,12 @@
 ## Endpoints
 
 ### Health & Config
+
 - `GET /api/health` - API status + failure metrics
 - `GET /api/config` - Current crash/failure configuration
 
 ### Cosmic Data
+
 - `GET /api/transits` - All planetary transits
 - `GET /api/transits/:planet` - Single transit (e.g., `/api/transits/Mercury`)
 - `GET /api/tarot` - All tarot cards
@@ -60,34 +64,41 @@
 ## Testing Crash/Failure Behavior
 
 ### Low Stress (Safe Testing)
+
 ```powershell
 .\launch.ps1 -CrashProb 0.05 -FailureProb 0.05 -MaxFailures 10
 ```
+
 Crash: 5% chance after each request | Failure: 5% chance per request
 
 ### Medium Stress (Integration Testing)
+
 ```powershell
 .\launch.ps1 -CrashProb 0.2 -FailureProb 0.15 -MaxFailures 5
 ```
+
 Crash: 20% chance | Failure: 15% chance (capped at 5 consecutive)
 
 ### High Stress (Resilience Testing)
+
 ```powershell
 .\launch.ps1 -CrashProb 0.5 -FailureProb 0.3 -MaxFailures 3
 ```
+
 Crash: 50% chance | Failure: 30% chance (tight limit = rapid recovery)
 
 ## Services
 
 | Service | Port | URL |
-|---------|------|-----|
-| API | 5000 | http://localhost:5000 |
-| Frontend | 5173 | http://localhost:5173 |
-| Nginx | 80/443 | http://localhost |
+| --------- | ------ | ----- |
+| API | 5000 | <http://localhost:5000> |
+| Frontend | 5173 | <http://localhost:5173> |
+| Nginx | 80/443 | <http://localhost> |
 
 ## Stopping Services
 
 Press `Ctrl+C` in the terminal running the launcher, or in another terminal:
+
 ```bash
 docker compose down
 ```
@@ -95,6 +106,7 @@ docker compose down
 ## Debugging
 
 ### View logs
+
 ```bash
 # All services
 docker compose logs -f
@@ -108,11 +120,13 @@ docker compose logs --tail 50
 ```
 
 ### Check container status
+
 ```bash
 docker compose ps
 ```
 
 ### Inspect API config
+
 ```bash
 curl http://localhost:5000/api/config
 ```
@@ -120,6 +134,7 @@ curl http://localhost:5000/api/config
 ## Environment Variables (Manual Override)
 
 If you prefer to set env vars manually before launching:
+
 ```bash
 export CRASH_PROBABILITY=0.1
 export FAILURE_PROBABILITY=0.05
