@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Backend API
   api:
@@ -20,6 +18,12 @@ services:
       - ./backend/src:/app/src
       - /app/node_modules
     command: npm run dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     networks:
       - cosmos-network
 
@@ -39,6 +43,12 @@ services:
       - ./cosmos-app/public:/app/public
       - /app/node_modules
     command: npm run dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     depends_on:
       - api
     networks:
