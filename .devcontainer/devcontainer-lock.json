@@ -5,10 +5,10 @@
       "resolved": "ghcr.io/cirolosapio/devcontainers-features/alpine-docker-outside-of-docker@sha256:3d6c41447f2bdcad89752f59595604b9fd529e712c008b45c4d3312892ac5361",
       "integrity": "sha256:3d6c41447f2bdcad89752f59595604b9fd529e712c008b45c4d3312892ac5361"
     },
-    "ghcr.io/devcontainer-config/features/dot-config:4": {
-      "version": "4.0.0",
-      "resolved": "ghcr.io/devcontainer-config/features/dot-config@sha256:d9ca770ccb218e619d5725fd50f00dfacdf582d92a8c3901f11b53b1caddd878",
-      "integrity": "sha256:d9ca770ccb218e619d5725fd50f00dfacdf582d92a8c3901f11b53b1caddd878"
+    "ghcr.io/devcontainer-config/features/dot-config:5": {
+      "version": "5.0.0",
+      "resolved": "ghcr.io/devcontainer-config/features/dot-config@sha256:dfbe76767fb0e284f078a06e7857734cc765daf5ae4e5c4ea4152105e861dd0b",
+      "integrity": "sha256:dfbe76767fb0e284f078a06e7857734cc765daf5ae4e5c4ea4152105e861dd0b"
     },
     "ghcr.io/devcontainers-extra/features/alp-asdf:2": {
       "version": "2.0.16",

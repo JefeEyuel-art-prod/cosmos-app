@@ -16,7 +16,7 @@
 		"ghcr.io/cirolosapio/devcontainers-features/alpine-docker-outside-of-docker:0": {},
 		"ghcr.io/juan-ayala/devcontainer-features/aem-lts:1": {},
 		"ghcr.io/devcontainers-extra/features/alp-asdf:2": {},
-		"ghcr.io/devcontainer-config/features/dot-config:4": {},
+		"ghcr.io/devcontainer-config/features/dot-config:5": {},
 		"ghcr.io/postfinance/devcontainer-features/dotnet:1": {}
 	}
 
