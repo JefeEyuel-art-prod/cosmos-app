@@ -29,6 +29,12 @@ desktop.ini
 # VS Code server (remote dev artifacts, should not be committed)
 vscode-server-linux-x64/
 
+# Local JDK installations and IDE runtime artifacts
+oracleJdk-26/
+**/oracleJdk-26/
+.jdk/
+**/.jdk/
+
 # Misc
 *.swp
 coverage/

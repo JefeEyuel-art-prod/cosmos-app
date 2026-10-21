@@ -9,7 +9,7 @@ import {
   type ZodiacSign,
 } from './services/astrology'
 import { loadPreferences, savePreferences } from './services/preferences'
-import { saveReading } from './services/api'
+import { drawTarotCard, fetchCosmicCalendar, fetchDailyCosmicForecast, fetchRecentReadings, fetchTarotDecks, fetchTransitData, saveReading, type CosmicEvent, type DailyCosmicForecast, type SavedReading, type TarotCard, type TarotDeck, type Transit } from './services/api'
 
 const pillars = [
   {
@@ -200,21 +200,50 @@ const galaxyImages = [
   },
 ]
 
+const spreadPositions: Record<1 | 3 | 5 | 9, string[]> = {
+  1: ['Focus'],
+  3: ['Past', 'Present', 'Future'],
+  5: ['Situation', 'Challenge', 'Guidance', 'Action', 'Outcome'],
+  9: ['Self', 'Root', 'Past', 'Present', 'Future', 'Challenge', 'Guidance', 'Hidden influence', 'Integration'],
+}
+
+const spreadTemplates: Record<1 | 3 | 5 | 9, string[]> = {
+  1: ['Focus: identify the single truth that deserves attention today.'],
+  3: ['Past: name the pattern that shaped the question.', 'Present: describe what is actually active now.', 'Future: choose the direction your next action makes more likely.'],
+  5: ['Situation: define the real context without adding a prediction.', 'Challenge: locate the friction, fear, or assumption.', 'Guidance: identify the perspective that changes the reading.', 'Action: select a behavior you can observe and complete.', 'Outcome: describe the likely result if the action is practiced.'],
+  9: ['Self: notice your current stance and agency.', 'Root: trace the deeper cause beneath the visible issue.', 'Past: identify the inherited pattern or recent history.', 'Present: read the immediate reality without fantasy.', 'Future: name the trajectory already being built.', 'Challenge: locate resistance and its useful information.', 'Guidance: find the principle that can organize the spread.', 'Hidden influence: surface what is affecting the situation indirectly.', 'Integration: convert the full pattern into one grounded commitment.'],
+}
+
+const fallbackDecks: TarotDeck[] = tarotDecks.map((deck) => ({
+  ...deck,
+  cards: deck.cards.map((card) => ({
+    ...card,
+    theme: card.energy,
+    shadow: 'Notice where this energy becomes unbalanced or performative.',
+    question: `Where does ${card.title} meet your current situation?`,
+    action: 'Choose one small action that tests this insight in real life.',
+  })),
+}))
+
 function App() {
   const [name, setName] = createSignal('')
   const [eventIndex, setEventIndex] = createSignal(0)
   const [message, setMessage] = createSignal(
     'The cosmos is listening. Tap a star to ignite a new insight.',
   )
-  const [selectedTransit, setSelectedTransit] = createSignal(transitLog[0])
+  const [transits, setTransits] = createSignal<Transit[]>(transitLog)
+  const [selectedTransit, setSelectedTransit] = createSignal<Transit>(transitLog[0])
   const [feed, setFeed] = createSignal([
     'Cosmic feed initialized. Ready for astral updates.',
   ])
 
   // Tarot: which deck is active, and which card is currently selected within it.
-  const [selectedDeckId, setSelectedDeckId] = createSignal(tarotDecks[0].id)
-  const activeDeck = () => tarotDecks.find((deck) => deck.id === selectedDeckId()) ?? tarotDecks[0]
-  const [selectedTarot, setSelectedTarot] = createSignal(tarotDecks[0].cards[0])
+  const [decks, setDecks] = createSignal<TarotDeck[]>(fallbackDecks)
+  const [selectedDeckId, setSelectedDeckId] = createSignal(fallbackDecks[0].id)
+  const activeDeck = () => decks().find((deck) => deck.id === selectedDeckId()) ?? fallbackDecks[0]
+  const [selectedTarot, setSelectedTarot] = createSignal<TarotCard>(fallbackDecks[0].cards[0])
+  const [spreadSize, setSpreadSize] = createSignal<1 | 3 | 5 | 9>(1)
+  const [spreadCards, setSpreadCards] = createSignal<TarotCard[]>([fallbackDecks[0].cards[0]])
   const [tarotMessage, setTarotMessage] = createSignal(
     'Select a card to feel its energetic signification, or draw a new card from the deck.',
   )
@@ -231,12 +260,51 @@ function App() {
   )
   const [savingReading, setSavingReading] = createSignal(false)
   const [savedReadingId, setSavedReadingId] = createSignal<string | null>(null)
+  const [feedback, setFeedback] = createSignal('')
+  const [showGuide, setShowGuide] = createSignal(true)
+  const [savedReadings, setSavedReadings] = createSignal<SavedReading[]>([])
+  const [historyLoading, setHistoryLoading] = createSignal(false)
+  const [dataLoading, setDataLoading] = createSignal(false)
+  const [dataError, setDataError] = createSignal('')
+  const [dailyForecast, setDailyForecast] = createSignal<DailyCosmicForecast | null>(null)
+  const [cosmicCalendar, setCosmicCalendar] = createSignal<CosmicEvent[]>([])
 
   // Load any persisted selections once the component mounts (browser-only).
-  onMount(() => {
+  onMount(async () => {
     const prefs = loadPreferences()
+    setDataLoading(true)
+    try {
+      const [remoteDecks, remoteTransits] = await Promise.all([fetchTarotDecks(), fetchTransitData()])
+      if (remoteDecks.length) {
+        setDecks(remoteDecks)
+        const firstDeck = remoteDecks.find((deck) => deck.id === (prefs.selectedDeckId || 'classic')) ?? remoteDecks[0]
+        setSelectedDeckId(firstDeck.id)
+        setSelectedTarot(firstDeck.cards[0])
+      }
+      if (remoteTransits.length) {
+        setTransits(remoteTransits)
+        setSelectedTransit(remoteTransits[0])
+      }
+    } catch {
+      setDataError('Using the local constellation while the API reconnects.')
+    } finally {
+      setDataLoading(false)
+    }
+    try {
+      setCosmicCalendar(await fetchCosmicCalendar())
+    } catch {
+      setDataError('The cosmic calendar is unavailable until the API reconnects.')
+    }
+    setHistoryLoading(true)
+    try {
+      setSavedReadings(await fetchRecentReadings())
+    } catch {
+      setFeedback('Reading history is unavailable until the API reconnects.')
+    } finally {
+      setHistoryLoading(false)
+    }
     if (prefs.selectedDeckId) {
-      const deck = tarotDecks.find((d) => d.id === prefs.selectedDeckId)
+      const deck = decks().find((d) => d.id === prefs.selectedDeckId)
       if (deck) {
         setSelectedDeckId(deck.id)
         setSelectedTarot(deck.cards[0])
@@ -252,6 +320,7 @@ function App() {
     if (typeof prefs.latitude === 'number') setLatitude(prefs.latitude)
     if (typeof prefs.longitude === 'number') setLongitude(prefs.longitude)
     if (prefs.name) setName(prefs.name)
+    await refreshDailyForecast()
   })
 
   const sunZodiac = () => findZodiacSign(getSunSignName(birthDate()))
@@ -265,11 +334,24 @@ function App() {
 
   const currentEvent = () => astroEvents[eventIndex()]
 
+  const refreshDailyForecast = async () => {
+    try {
+      setDailyForecast(await fetchDailyCosmicForecast({
+        sunSign: sunZodiac()?.name,
+        moonSign: moonZodiac()?.name,
+        risingSign: risingZodiac()?.name,
+      }))
+    } catch {
+      setDataError('Daily cosmic weather is unavailable until the API reconnects.')
+    }
+  }
+
   const revealBomb = () => {
     const bomb = trueBombs[Math.floor(Math.random() * trueBombs.length)]
     const nextMessage = `${name() ? `${name()}, ` : ''}${bomb}`
     setMessage(nextMessage)
     setFeed((current) => [nextMessage, ...current].slice(0, 6))
+    setFeedback('A new insight has entered your feed.')
   }
 
   const nextEvent = () => {
@@ -278,33 +360,78 @@ function App() {
     const nextMessage = `Incoming ${astroEvents[next].name}: ${astroEvents[next].hint}`
     setMessage(nextMessage)
     setFeed((current) => [nextMessage, ...current].slice(0, 6))
+    setFeedback(`${astroEvents[next].name} is now active.`)
   }
 
-  const selectTransit = (entry: typeof transitLog[number]) => {
+  const selectTransit = (entry: Transit) => {
     setSelectedTransit(entry)
     setMessage(`Now aligning with ${entry.planet} (${entry.myth}) — ${entry.note}`)
+    setFeedback(`${entry.planet} is now part of your reading.`)
   }
 
   const selectDeck = (deckId: string) => {
     setSelectedDeckId(deckId)
     savePreferences({ selectedDeckId: deckId })
-    const deck = tarotDecks.find((d) => d.id === deckId)
+    const deck = decks().find((d) => d.id === deckId)
     if (deck) {
       setSelectedTarot(deck.cards[0])
       setTarotMessage(`Switched to ${deck.name}. ${deck.description}`)
     }
   }
 
-  const selectTarot = (card: typeof tarotDecks[number]['cards'][number]) => {
+  const selectTarot = (card: TarotCard) => {
     setSelectedTarot(card)
-    setTarotMessage(`${card.title} resonates with ${card.energy}`)
+    setTarotMessage(`${card.title}: ${card.theme}`)
+    setFeedback(`${card.title} selected. Generate a reading when ready.`)
   }
 
-  const drawTarot = () => {
-    const cards = activeDeck().cards
-    const card = cards[Math.floor(Math.random() * cards.length)]
-    setSelectedTarot(card)
-    setTarotMessage(`You drew ${card.title}: ${card.energy}`)
+  const drawTarot = async () => {
+    try {
+      const drawn = await drawTarotCard(activeDeck().id, spreadSize())
+      setSpreadCards(drawn.cards)
+      setSelectedTarot(drawn.cards[0])
+      setTarotMessage(`${drawn.cards.length}-card spread drawn. Read each position as part of one story.`)
+      setFeedback(`${drawn.cards.length}-card ${activeDeck().name} spread is ready.`)
+    } catch {
+      const cards = activeDeck().cards
+      const drawn = Array.from({ length: spreadSize() }, (_, index) => cards[index % cards.length])
+      setSpreadCards(drawn)
+      setSelectedTarot(drawn[0])
+      setTarotMessage(`${drawn.length}-card local spread drawn while the API reconnects.`)
+      setDataError('The API draw failed, so a local spread was drawn instead.')
+      setFeedback(`${drawn.length}-card spread is ready.`)
+    }
+  }
+
+  const chooseSpread = (size: 1 | 3 | 5 | 9) => {
+    setSpreadSize(size)
+    setSpreadCards([activeDeck().cards[0]])
+    setSelectedTarot(activeDeck().cards[0])
+    setTarotMessage(size === 1 ? 'Single-card reflection selected.' : `${size}-card spread selected: ${spreadPositions[size].join(' · ')}. Draw when ready.`)
+  }
+
+  const resetJourney = () => {
+    setName('')
+    setBirthDate('')
+    setBirthTime('')
+    setUtcOffset(0)
+    setLatitude(0)
+    setLongitude(0)
+    setSelectedZodiac(null)
+    setSelectedTarot(decks()[0].cards[0])
+    setSpreadCards([decks()[0].cards[0]])
+    setSpreadSize(1)
+    setSelectedDeckId(decks()[0].id)
+    setSavedReadingId(null)
+    setDeepReading('Enter your birth date and draw a card to weave a deeper diagnostic of your current situation.')
+    savePreferences({ name: '', birthDate: '', birthTime: '', utcOffsetHours: 0, latitude: 0, longitude: 0, selectedZodiacName: null, selectedDeckId: decks()[0].id })
+    setFeedback('Your journey has been reset.')
+  }
+
+  const copyReading = async () => {
+    if (!deepReading() || !navigator.clipboard) return
+    await navigator.clipboard.writeText(deepReading())
+    setFeedback('Reading copied to your clipboard.')
   }
 
   const selectZodiac = (sign: ZodiacSign) => {
@@ -348,15 +475,21 @@ function App() {
       setDeepReading('Add your birth date (or tap a zodiac sign) so the reading can anchor to your chart.')
       return
     }
-    const card = selectedTarot()
+    const cards = spreadCards()
     const transit = selectedTransit()
     const moon = moonZodiac()
     const rising = risingZodiac()
-
-    const moonLine = moon ? ` Your Moon sign is estimated as ${moon.symbol} ${moon.name}, coloring your emotional undercurrent.` : ''
-    const risingLine = rising ? ` Your Rising sign is estimated as ${rising.symbol} ${rising.name}, shaping how this shows up outwardly.` : ''
-
-    const reading = `${zodiac.symbol} ${zodiac.name} Sun (${zodiac.element}, ruled by ${zodiac.ruler}) meets ${card.title} under the ${transit.planet} transit: ${card.energy}${moonLine}${risingLine} Combined with a nature that is ${zodiac.trait.toLowerCase()} — and the pull of ${transit.myth} — this points toward a situation asking you to move from ${transit.dimension.toLowerCase()} into clear action.`
+    const previous = savedReadings().slice(0, 3)
+    const moonLine = moon ? ` Moon: ${moon.name}, adding an emotional lens.` : ' Moon: not estimated yet.'
+    const risingLine = rising ? ` Rising: ${rising.name}, shaping how the pattern appears outwardly.` : ' Rising: add birth time and location for this layer.'
+    const historyLine = previous.length ? ` Your ${previous.length} recent reading${previous.length > 1 ? 's are' : ' is'} treated as context, not destiny; look for repeated questions rather than repeated predictions.` : ' This is your first saved reading, so future pulls can be compared against it.'
+    await refreshDailyForecast()
+    const forecast = dailyForecast()
+    const positions = spreadPositions[spreadSize()]
+    const templateLines = spreadTemplates[spreadSize()].join(' ')
+    const cardLines = cards.map((card, index) => `${positions[index] || `Card ${index + 1}`} holds ${card.title}: ${card.theme} Watch for ${card.shadow} Ask: ${card.question} Practice: ${card.action}`).join(' ')
+    const cosmicLine = forecast ? ` Daily sky (${forecast.date}): ${forecast.alignment}; ${forecast.retrograde}. Collective theme: ${forecast.collective} Personal impact: ${forecast.impact}` : ''
+    const reading = `${spreadSize()}-card personal spread for ${name() || 'the seeker'}: ${zodiac.symbol} ${zodiac.name} Sun (${zodiac.element}, ruled by ${zodiac.ruler}) meets the ${transit.planet} ${transit.dimension.toLowerCase()} transit.${moonLine}${risingLine}${historyLine}${cosmicLine} Analysis template: ${templateLines} Analysis method: read each named position first, then compare the sequence for repeating themes, tensions, and movement from context to action. ${cardLines}`
 
     setDeepReading(reading)
     setFeed((current) => [reading, ...current].slice(0, 6))
@@ -372,11 +505,18 @@ function App() {
         risingSign: rising?.name,
         deckId: activeDeck().id,
         deckName: activeDeck().name,
-        card: card.title,
+        card: cards[0].title,
         transitPlanet: transit.planet,
+        spreadSize: spreadSize(),
+        spreadCards: cards.map((card) => card.title),
+        spreadPositions: positions,
+        priorReadingCount: previous.length,
+        cosmicDate: forecast?.date,
+        cosmicImpact: forecast?.impact,
         readingText: reading,
       })
       setSavedReadingId(saved.id)
+      setSavedReadings((current) => [saved, ...current.filter((item) => item.id !== saved.id)].slice(0, 20))
     } catch {
       // Backend may be briefly unreachable (e.g. simulated failures); the
       // reading is still shown locally even if saving/sharing fails.
@@ -389,6 +529,10 @@ function App() {
   return (
     <div class="app-shell">
       <header class="hero-card">
+        <div class="journey-status" aria-live="polite">
+          <span class="status-orb" />
+          <span>{feedback() || 'Your personal cosmic workspace'}</span>
+        </div>
         <p class="eyebrow">Cosmos App</p>
         <h1>Linking higher forms of intelligence.</h1>
         <p class="hero-copy">
@@ -409,7 +553,30 @@ function App() {
         </div>
       </header>
 
+      <nav class="section-nav" aria-label="Cosmos sections">
+        <a href="#dispatch">Dispatch</a>
+        <a href="#transits">Transits</a>
+        <a href="#weather">Today</a>
+        <a href="#calendar">Calendar</a>
+        <a href="#tarot">Tarot</a>
+        <a href="#chart">Birth chart</a>
+        <a href="#history">History</a>
+        <a href="#gallery">Gallery</a>
+        <button type="button" class="reset-btn" onClick={resetJourney}>Reset</button>
+      </nav>
+
       <section class="signal-row" id="vision">
+        {dataLoading() && <div class="data-status">Syncing tarot and transit archives…</div>}
+        {dataError() && <div class="data-status warning">{dataError()}</div>}
+        <div class="guide-card">
+          <div>
+            <strong>Start here</strong>
+            <span>{showGuide() ? 'Choose a transit, draw a card, then generate your personal reading.' : 'Your workspace is ready whenever you are.'}</span>
+          </div>
+          <button type="button" class="guide-toggle" onClick={() => setShowGuide((visible) => !visible)}>
+            {showGuide() ? 'Hide guide' : 'Show guide'}
+          </button>
+        </div>
         <For each={signals}>{(signal) => (
           <div class="signal-pill">{signal}</div>
         )}</For>
@@ -436,7 +603,7 @@ function App() {
           </div>
         </article>
 
-        <article class="panel cosmic-panel">
+        <article class="panel cosmic-panel" id="dispatch">
           <h2>Cosmic Dispatch</h2>
           <p>
             Short interactive panel for lightning-fast cosmology and astrology events. Drop true bombs,
@@ -491,7 +658,42 @@ function App() {
           </div>
         </article>
 
-        <article class="panel transit-panel">
+        <article class="panel cosmic-weather-panel" id="weather">
+          <div class="weather-header">
+            <div>
+              <h2>Today’s cosmic weather</h2>
+              <p>Updated from the current UTC date. Use it as reflective context, not a fixed prediction.</p>
+            </div>
+            <button type="button" class="secondary-action" onClick={refreshDailyForecast}>Refresh</button>
+          </div>
+          {dailyForecast() ? (
+            <div class="weather-grid">
+              <div><strong>{dailyForecast()!.alignment}</strong><span>{dailyForecast()!.status}</span></div>
+              <div><strong>Retrograde watch</strong><span>{dailyForecast()!.retrograde}</span></div>
+              <div><strong>Collective consciousness</strong><span>{dailyForecast()!.collective}</span></div>
+              <div><strong>Your chart impact</strong><span>{dailyForecast()!.impact}</span></div>
+            </div>
+          ) : <p class="history-empty">Add chart information or refresh to read today’s sky.</p>}
+        </article>
+
+        <article class="panel calendar-panel" id="calendar">
+          <div class="weather-header">
+            <div>
+              <h2>Upcoming planetary events</h2>
+              <p>Local dates are calculated from your browser timezone.</p>
+            </div>
+          </div>
+          <div class="calendar-list">
+            <For each={cosmicCalendar()}>{(event) => (
+              <div class="calendar-event">
+                <time>{event.date}</time>
+                <div><strong>{event.label}</strong><span>{event.kind} · {event.description}</span></div>
+              </div>
+            )}</For>
+          </div>
+        </article>
+
+        <article class="panel transit-panel" id="transits">
           <div class="transit-header">
             <div>
               <h2>Astrology Transit Log</h2>
@@ -503,7 +705,7 @@ function App() {
           </div>
 
           <div class="transit-path">
-            {transitLog.map((entry, index) => (
+            {transits().map((entry, index) => (
               <span
                 class="path-node"
                 classList={{ active: selectedTransit().planet === entry.planet }}
@@ -516,7 +718,7 @@ function App() {
           </div>
 
           <div class="transit-grid">
-            <For each={transitLog}>{(entry) => (
+            <For each={transits()}>{(entry) => (
               <div
                 class={`transit-card${selectedTransit().planet === entry.planet ? ' selected' : ''}`}
                 onClick={() => selectTransit(entry)}
@@ -546,19 +748,27 @@ function App() {
           </div>
         </article>
 
-        <article class="panel tarot-panel">
+        <article class="panel tarot-panel" id="tarot">
           <div class="tarot-header">
             <div>
               <h2>Tarot Decks</h2>
-              <p>{activeDeck().description}</p>
+              <p>{activeDeck().description} Select a card to study its theme, shadow, question, and real-world practice.</p>
             </div>
-            <button class="tarot-draw-btn" type="button" onClick={drawTarot}>
-              Draw a card
-            </button>
+            <div class="spread-controls" aria-label="Choose spread size">
+              <span>Spread</span>
+              <For each={[1, 3, 5, 9] as const}>{(size) => (
+                <button type="button" class={`spread-size${spreadSize() === size ? ' active' : ''}`} onClick={() => chooseSpread(size)}>
+                  {size === 1 ? '1 card' : `${size} cards`}
+                </button>
+              )}</For>
+              <button class="tarot-draw-btn" type="button" onClick={drawTarot}>
+                Draw spread
+              </button>
+            </div>
           </div>
 
           <div class="deck-tabs">
-            <For each={tarotDecks}>{(deck) => (
+            <For each={decks()}>{(deck) => (
               <button
                 type="button"
                 class={`deck-tab${selectedDeckId() === deck.id ? ' active' : ''}`}
@@ -578,6 +788,21 @@ function App() {
               </div>
             </div>
             <p class="tarot-message">{tarotMessage()}</p>
+            <div class="spread-cards" aria-label="Cards in current spread">
+              <For each={spreadCards()}>{(card, index) => (
+                <button type="button" class={`spread-card${selectedTarot().title === card.title ? ' active' : ''}`} onClick={() => selectTarot(card)}>
+                  <span>{spreadPositions[spreadSize()][index()] || `Card ${index() + 1}`}</span>
+                  <strong>{card.symbol}</strong>
+                  <small>{card.title}</small>
+                </button>
+              )}</For>
+            </div>
+            <div class="tarot-analysis-grid">
+              <div><strong>Core theme</strong><span>{selectedTarot().theme}</span></div>
+              <div><strong>Watch for</strong><span>{selectedTarot().shadow}</span></div>
+              <div><strong>Ask yourself</strong><span>{selectedTarot().question}</span></div>
+              <div><strong>Practice</strong><span>{selectedTarot().action}</span></div>
+            </div>
           </div>
 
           <div class="tarot-grid">
@@ -594,7 +819,35 @@ function App() {
           </div>
         </article>
 
-        <article class="panel zodiac-panel">
+        <article class="panel history-panel" id="history">
+          <div class="history-header">
+            <div>
+              <h2>Saved readings</h2>
+              <p>Return to the questions and practices you generated before.</p>
+            </div>
+            <span class="transit-badge">{savedReadings().length} saved</span>
+          </div>
+          {historyLoading() && <p class="history-empty">Loading your reading history…</p>}
+          {!historyLoading() && savedReadings().length === 0 && (
+            <p class="history-empty">Generate a deep reading and it will appear here.</p>
+          )}
+          <div class="history-list">
+            <For each={savedReadings()}>{(reading) => (
+              <button type="button" class="history-item" onClick={() => {
+                setDeepReading(reading.readingText)
+                setSavedReadingId(reading.id)
+                setFeedback(`Reopened ${reading.card || 'saved reading'}.`)
+              }}>
+                <span class="history-item-title">{reading.card || 'Cosmic reading'}</span>
+                <span>{reading.spreadSize || 1}-card spread · {reading.sunSign || 'Chart unknown'} · {reading.transitPlanet || 'Transit unknown'}</span>
+                {reading.spreadPositions?.length && <small>{reading.spreadPositions.join(' · ')}</small>}
+                <small>{new Date(reading.createdAt).toLocaleString()}</small>
+              </button>
+            )}</For>
+          </div>
+        </article>
+
+        <article class="panel zodiac-panel" id="chart">
           <div class="zodiac-header">
             <div>
               <h2>Birth Chart & Zodiac Wheel</h2>
@@ -716,10 +969,15 @@ function App() {
             )}
           </div>
 
-          <button class="deep-reading-btn" type="button" onClick={generateDeepReading} disabled={savingReading()}>
+          <div class="reading-actions">
+            <button class="deep-reading-btn" type="button" onClick={generateDeepReading} disabled={savingReading()}>
             {savingReading() ? 'Saving reading…' : 'Generate deep reading'}
-          </button>
-          <p class="deep-reading-message">{deepReading()}</p>
+            </button>
+            <button class="secondary-action" type="button" onClick={copyReading} disabled={!deepReading() || savingReading()}>
+              Copy reading
+            </button>
+          </div>
+          <p class="deep-reading-message" aria-live="polite">{deepReading()}</p>
           {savedReadingId() && (
             <p class="deep-reading-share">
               Saved. Share this reading with id: <code>{savedReadingId()}</code>
@@ -727,7 +985,7 @@ function App() {
           )}
         </article>
 
-        <article class="panel galaxy-panel">
+        <article class="panel galaxy-panel" id="gallery">
           <div class="galaxy-header">
             <div>
               <h2>Galaxy Gallery</h2>

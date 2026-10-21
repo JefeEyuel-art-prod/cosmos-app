@@ -1,5 +1,5 @@
 # Development stage
-FROM node:20-alpine AS development
+FROM node:22-bookworm AS development
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -8,7 +8,7 @@ EXPOSE 5173
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 # Build stage
-FROM node:20-alpine AS build
+FROM node:22-bookworm AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install

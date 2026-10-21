@@ -157,6 +157,128 @@
   gap: 10px;
 }
 
+.section-nav {
+  position: sticky;
+  top: 14px;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(170, 59, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 14px 34px rgba(20, 24, 35, 0.08);
+}
+
+.section-nav a,
+.reset-btn,
+.guide-toggle,
+.secondary-action {
+  border: 1px solid rgba(170, 59, 255, 0.16);
+  border-radius: 999px;
+  padding: 9px 13px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #281440;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.section-nav a:hover,
+.reset-btn:hover,
+.guide-toggle:hover,
+.secondary-action:hover {
+  transform: translateY(-2px);
+  background: rgba(238, 223, 255, 0.95);
+}
+
+.reset-btn {
+  margin-left: auto;
+  color: #8c255f;
+}
+
+.guide-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(100deg, rgba(170, 59, 255, 0.12), rgba(109, 124, 255, 0.08));
+  border: 1px solid rgba(170, 59, 255, 0.14);
+}
+
+.guide-card > div {
+  display: grid;
+  gap: 3px;
+}
+
+.guide-card strong {
+  color: #281440;
+}
+
+.guide-card span {
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.guide-toggle {
+  flex: 0 0 auto;
+}
+
+.journey-status {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(170, 59, 255, 0.14);
+  color: #51247a;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.status-orb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #aa3bff;
+  box-shadow: 0 0 0 5px rgba(170, 59, 255, 0.12), 0 0 18px rgba(170, 59, 255, 0.7);
+}
+
+.reading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.secondary-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#dispatch,
+#transits,
+#weather,
+#calendar,
+#tarot,
+#chart,
+#gallery {
+  scroll-margin-top: 92px;
+}
+
 .signal-pill {
   padding: 10px 16px;
   border-radius: 999px;
@@ -518,6 +640,38 @@
   box-shadow: 0 16px 30px rgba(170, 59, 255, 0.2);
 }
 
+.spread-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.spread-controls > span {
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.spread-size {
+  padding: 8px 11px;
+  border: 1px solid rgba(170, 59, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.spread-size.active {
+  background: rgba(170, 59, 255, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .tarot-status {
   display: grid;
   gap: 16px;
@@ -551,6 +705,220 @@
   color: var(--text);
   font-size: 1rem;
   line-height: 1.6;
+}
+
+.spread-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.spread-card {
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  padding: 10px 6px;
+  border: 1px solid rgba(170, 59, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.spread-card:hover,
+.spread-card.active {
+  border-color: var(--accent);
+  background: rgba(238, 223, 255, 0.95);
+}
+
+.spread-card > span {
+  min-height: 2.2em;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.spread-card strong {
+  color: var(--accent);
+  font-size: 1.35rem;
+}
+
+.spread-card small {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tarot-analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tarot-analysis-grid > div {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(170, 59, 255, 0.07);
+  border: 1px solid rgba(170, 59, 255, 0.12);
+}
+
+.tarot-analysis-grid strong {
+  color: var(--accent);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tarot-analysis-grid span {
+  color: var(--text-h);
+  line-height: 1.45;
+}
+
+.data-status {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(170, 59, 255, 0.1);
+  color: #51247a;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.data-status.warning {
+  background: rgba(231, 162, 64, 0.14);
+  color: #774915;
+}
+
+.history-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.history-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.history-item {
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  padding: 14px;
+  border: 1px solid rgba(170, 59, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(170, 59, 255, 0.4);
+}
+
+.history-item-title {
+  color: var(--text-h);
+  font-weight: 800;
+}
+
+.history-item small {
+  color: var(--accent);
+}
+
+.cosmic-weather-panel,
+.calendar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.weather-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.calendar-list {
+  display: grid;
+  gap: 8px;
+  max-height: 430px;
+  overflow: auto;
+}
+
+.calendar-event {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(170, 59, 255, 0.07);
+  border: 1px solid rgba(170, 59, 255, 0.13);
+}
+
+.calendar-event time {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.calendar-event div {
+  display: grid;
+  gap: 4px;
+}
+
+.calendar-event span {
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.weather-grid > div {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(170, 59, 255, 0.07);
+  border: 1px solid rgba(170, 59, 255, 0.13);
+}
+
+.weather-grid strong {
+  color: var(--accent);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.weather-grid span {
+  color: var(--text-h);
+  line-height: 1.45;
+}
+
+.history-empty {
+  margin: 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(170, 59, 255, 0.07);
 }
 
 .tarot-grid {
@@ -906,6 +1274,19 @@
 }
 
 @media (max-width: 840px) {
+  .section-nav {
+    top: 8px;
+  }
+
+  .reset-btn {
+    margin-left: 0;
+  }
+
+  .guide-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .app-shell {
     padding: 20px;
   }
@@ -927,6 +1308,21 @@
   }
 
   .chart-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .spread-controls {
+    justify-content: flex-start;
+  }
+
+  .weather-grid,
+  .tarot-analysis-grid,
+  .calendar-event {
+    grid-template-columns: 1fr;
+  }
+
+  .tarot-analysis-grid,
+  .history-list {
     grid-template-columns: 1fr;
   }
 }
