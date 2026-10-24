@@ -15,10 +15,10 @@
       "resolved": "ghcr.io/devcontainers-extra/features/alp-asdf@sha256:c7e599d38dd3da1cf0911f5d08b51b443dd01b4abcd4175639f8d2f2839d8d89",
       "integrity": "sha256:c7e599d38dd3da1cf0911f5d08b51b443dd01b4abcd4175639f8d2f2839d8d89"
     },
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": "2.17.0",
-      "resolved": "ghcr.io/devcontainers/features/docker-in-docker@sha256:25b9f05705ffba7dbe503230ac76081419306f8c8bc88e0ce78c4ecd99a0c78c",
-      "integrity": "sha256:25b9f05705ffba7dbe503230ac76081419306f8c8bc88e0ce78c4ecd99a0c78c"
+    "ghcr.io/devcontainers/features/docker-in-docker:4": {
+      "version": "4.1.3",
+      "resolved": "ghcr.io/devcontainers/features/docker-in-docker@sha256:fae40f3c8be5a7c3b0db344c1d30341bc2c91ba38d1d5b14cd2ad72e6d65d084",
+      "integrity": "sha256:fae40f3c8be5a7c3b0db344c1d30341bc2c91ba38d1d5b14cd2ad72e6d65d084"
     },
     "ghcr.io/devcontainers/features/node:1": {
       "version": "1.7.1",
@@ -44,9 +44,9 @@
       ]
     },
     "ghcr.io/postfinance/devcontainer-features/dotnet:1": {
-      "version": "1.0.0",
-      "resolved": "ghcr.io/postfinance/devcontainer-features/dotnet@sha256:22bce48a820093d32fb49f321fd2ab37b18e0b0e68d73b3edd13bcffb9efaf63",
-      "integrity": "sha256:22bce48a820093d32fb49f321fd2ab37b18e0b0e68d73b3edd13bcffb9efaf63"
+      "version": "1.0.1",
+      "resolved": "ghcr.io/postfinance/devcontainer-features/dotnet@sha256:2ce9d706a751c4eba6407a890360b4bb490919e0f5b1c4673a125fbade2c8239",
+      "integrity": "sha256:2ce9d706a751c4eba6407a890360b4bb490919e0f5b1c4673a125fbade2c8239"
     }
   }
 }
